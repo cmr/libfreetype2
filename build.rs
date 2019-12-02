@@ -12,6 +12,7 @@ fn main() {
     let target = env::var("TARGET").unwrap();
     if !target.contains("eabi") &&
         !target.contains("android") &&
+	!target.contains("wasm32") &&
         pkg_config::Config::new().atleast_version("18.5.12").find("freetype2").is_ok() {
         return
     }
@@ -20,6 +21,8 @@ fn main() {
     if let Ok(s) = env::var("FREETYPE_CMAKE_GENERATOR") {
         config.generator(s);
     }
+    env::set_var("CC", "emcc");
+    env::set_var("CMAKE", env::current_dir().unwrap().join("cmake-emsdk-selector.sh"));
     let dst = config
         .define("WITH_BZip2", "OFF")
         .define("WITH_HarfBuzz", "OFF")
